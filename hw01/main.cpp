@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 
-#include <opencv2/freetype.hpp>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -80,28 +79,23 @@ int main(int argc, char *argv[]) {
   int width = static_cast<int>(video.get(CAP_PROP_FRAME_WIDTH));
   clog << frame_rate << " " << height << " " << width << endl;
 
+  VideoWriter video_output("output.avi", VideoWriter::fourcc('H', '2', '6', '4'), frame_rate, Size(width, height));
+
   Mat frame;
   for (const auto &img : img_list) {
     resizeKeepAspectRatio(img, frame, Size(width, height), Scalar::all(0));
-    imshow("Movie Player", frame);
-    waitKey(1500);
+    for (int i = 0; i < 2 * static_cast<int>(frame_rate); ++i) {
+      video_output.write(frame);
+    }
   }
 
   video.set(CAP_PROP_POS_FRAMES, 0);
   int i = 0;
-  while (i++, 1) {
-    if (!video.read(frame))
-      break;
-
+  while (i++, video.read(frame)) {
     putText(frame, "hello world", Point(i, 2 * i), FONT_HERSHEY_SIMPLEX, 1, Scalar::all(255));
-    imshow("Movie Player", frame);
-
-    char c = waitKey(33);
-    if (c == 27)
-      break;
+    video_output.write(frame);
   }
   video.release();
-  destroyWindow("Movie Player");
 
   return 0;
 }
