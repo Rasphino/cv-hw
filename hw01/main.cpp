@@ -81,18 +81,42 @@ int main(int argc, char *argv[]) {
 
   VideoWriter video_output("output.avi", VideoWriter::fourcc('H', '2', '6', '4'), frame_rate, Size(width, height));
 
-  Mat frame;
+  Mat frame, black(height, width, CV_8UC3, Scalar::all(0));
+  Point caption_pos = {width / 2, height / 2};
+  Point caption_speed = {3, 4};
+  string caption = "3170105166 - Honghao Li";
+  int animate_duration = 0.8 * static_cast<int>(frame_rate);
+
   for (const auto &img : img_list) {
     resizeKeepAspectRatio(img, frame, Size(width, height), Scalar::all(0));
-    for (int i = 0; i < 2 * static_cast<int>(frame_rate); ++i) {
+    putText(frame, caption, Point(width / 2 - caption.length() * 10, height - 20), FONT_HERSHEY_SIMPLEX, 1,
+            Scalar(0, 0, 255));
+
+    for (int i = 0; i < animate_duration; ++i) {
+      Mat tmp;
+      double ratio = double(i) / animate_duration;
+      addWeighted(frame, ratio, black, 1 - ratio, 0.0, tmp);
+      video_output.write(tmp);
+    }
+
+    for (int i = 0; i < 1.8 * static_cast<int>(frame_rate); ++i) {
       video_output.write(frame);
+    }
+
+    for (int i = 0; i < animate_duration; ++i) {
+      Mat tmp;
+      double ratio = double(i) / animate_duration;
+      addWeighted(frame, 1 - ratio, black, ratio, 0.0, tmp);
+      video_output.write(tmp);
     }
   }
 
   video.set(CAP_PROP_POS_FRAMES, 0);
-  int i = 0;
-  while (i++, video.read(frame)) {
-    putText(frame, "hello world", Point(i, 2 * i), FONT_HERSHEY_SIMPLEX, 1, Scalar::all(255));
+  while (video.read(frame)) {
+    caption_pos = caption_pos + caption_speed;
+    if (caption_pos.x < 2 * caption.length() * 10 || caption_pos.x > width - 2 * caption.length() * 10) caption_speed.x *= -1;
+    if (caption_pos.y < 20 || caption_pos.y > height - 20) caption_speed.y *= -1;
+    putText(frame, caption, Point(caption_pos), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255));
     video_output.write(frame);
   }
   video.release();
