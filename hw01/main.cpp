@@ -14,7 +14,7 @@ void loadImages(const string &dirname, vector<Mat> &img_list, bool showImages = 
   for (const auto &file : files) {
     Mat img = imread(file);
     if (img.empty()) {
-      clog << file << " is invalid, skip" << endl;
+      clog << file << " is not a image, skip" << endl;
       continue;
     }
     if (showImages) {
@@ -85,8 +85,20 @@ int main(int argc, char *argv[]) {
   Point caption_pos = {width / 2, height / 2};
   Point caption_speed = {3, 4};
   string caption = "3170105166 - Honghao Li";
+  string opening = "HW #1";
   int animate_duration = 0.8 * static_cast<int>(frame_rate);
 
+  // opening
+  for (int i = 0; i < 2 * static_cast<int>(frame_rate); ++i) {
+    frame = black.clone();
+    putText(frame, opening, Point(width / 2 - opening.length() * 20, height / 2 - 60), FONT_HERSHEY_SIMPLEX, 2,
+            Scalar(0, 0, 255));
+    putText(frame, caption, Point(width / 2 - caption.length() * 10, height / 2 - 20), FONT_HERSHEY_SIMPLEX, 1,
+            Scalar(0, 0, 255));
+    video_output.write(frame);
+  }
+
+  // images
   for (const auto &img : img_list) {
     resizeKeepAspectRatio(img, frame, Size(width, height), Scalar::all(0));
     putText(frame, caption, Point(width / 2 - caption.length() * 10, height - 20), FONT_HERSHEY_SIMPLEX, 1,
@@ -111,6 +123,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // video
   video.set(CAP_PROP_POS_FRAMES, 0);
   while (video.read(frame)) {
     caption_pos = caption_pos + caption_speed;
