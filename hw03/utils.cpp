@@ -63,7 +63,14 @@ cv::Mat utils::asRowMatrix(const vector<cv::Mat> &src, int rtype) {
   return data;
 }
 
+cv::Mat utils::asRowMatrix(const cv::Mat &src, int rtype) { return asRowMatrix(vector<cv::Mat>{src}, rtype); }
+
 cv::Mat utils::asColMatrix(const vector<cv::Mat> &src, int rtype) {
+  cv::Mat tmp = asRowMatrix(src, rtype);
+  transpose(tmp, tmp);
+  return tmp;
+}
+cv::Mat utils::asColMatrix(const cv::Mat &src, int rtype) {
   cv::Mat tmp = asRowMatrix(src, rtype);
   transpose(tmp, tmp);
   return tmp;

@@ -16,8 +16,10 @@ void read_JAFFE_data(std::string pathname, std::vector<cv::Mat> &images, std::ve
 cv::Mat norm_0_255(cv::Mat _src);
 
 cv::Mat asRowMatrix(const std::vector<cv::Mat> &src, int rtype);
+cv::Mat asRowMatrix(const cv::Mat &src, int rtype);
 
 cv::Mat asColMatrix(const std::vector<cv::Mat> &src, int rtype);
+cv::Mat asColMatrix(const cv::Mat &src, int rtype);
 
 } // namespace utils
 

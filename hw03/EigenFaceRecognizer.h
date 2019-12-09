@@ -11,20 +11,19 @@
 
 class EigenFaceRecognizer {
 public:
-  cv::Ptr<EigenFaceRecognizer> create(int num_components = 0, double shreshold = DBL_MAX);
-  void train(const std::vector<cv::Mat> &src, const std::vector<int> &labels);
-  int predict(const cv::Mat &src);
+  void train(const std::vector<cv::Mat> &src, const std::vector<int> &labels, double energy);
+  int predict(const cv::Mat &src, int &id, cv::Mat &proj);
 
-  double getThreshold() const;
-  std::vector<cv::Mat> getProjections() const;
-  cv::Mat getLabels() const;
+  void save(std::string model_name);
+  void read(std::string model_name);
+
+  std::vector<int> getLabels() const;
   cv::Mat getEigenValues() const;
   cv::Mat getEigenVectors() const;
   cv::Mat getMean() const;
 
 private:
-  int threshold;
-  std::vector<cv::Mat> projections;
+  cv::Mat projections;
   std::vector<int> labels;
   cv::Mat eigenvectors;
   cv::Mat eigenvalues;
